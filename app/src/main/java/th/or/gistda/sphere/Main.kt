@@ -7,7 +7,11 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.livedata.observeAsState
@@ -21,7 +25,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewmodel.compose.viewModel
 import org.json.JSONObject
-import th.or.gistda.sphere.ui.theme.Theme
+import th.or.gistda.sphere.ui.theme.MyApplicationTheme
 
 class Main : ComponentActivity() {
 
@@ -29,7 +33,7 @@ class Main : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             val message = remember { mutableStateOf("") }
-            Theme(darkTheme = false) {
+            MyApplicationTheme(darkTheme = false) {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -97,13 +101,26 @@ fun SphereMapView(message: MutableState<String>) {
         },
         update = {
             const?.run {
-                it.load(get("apiKey")!!, get("packageName")!!)
+                SphereMap.API_KEY = get("apiKey")
+                SphereMap.PACKAGE_NAME = get("packageName")
+                SphereMap.LAYER = SphereMap.SphereStatic("Layers", "HYBRID")
+                SphereMap.ZOOM = 10
+                SphereMap.ZOOM_RANGE = JSONObject()
+                    .put("min", 10)
+                    .put("max", 15)
+                SphereMap.LOCATION = JSONObject()
+                    .put("lon", 100.56)
+                    .put("lat", 13.74)
+                SphereMap.UI = SphereMap.SphereStatic("UiComponent", "None")
+                SphereMap.LAST_VIEW = true
+                SphereMap.LANGUAGE = "en"
+                it.load()
                 vm.const.value = null
             }
             call?.run {
                 it.call(
-                    get(SphereMapViewModel.METHOD)!! as String,
-                    get(SphereMapViewModel.ARGS)
+                    get(SphereMapViewModel.METHOD) as String,
+                    listOf(get(SphereMapViewModel.ARGS))
                 ) {
                     message.value = it
                 }
@@ -112,8 +129,8 @@ fun SphereMapView(message: MutableState<String>) {
             objectCall?.run {
                 it.objectCall(
                     get(SphereMapViewModel.OBJECT).let { it as JSONObject },
-                    get(SphereMapViewModel.METHOD)!! as String,
-                    get(SphereMapViewModel.ARGS)
+                    get(SphereMapViewModel.METHOD) as String,
+                    listOf(get(SphereMapViewModel.ARGS))
                 ) {
                     message.value = it
                 }

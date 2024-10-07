@@ -1,7 +1,7 @@
 package th.or.gistda.sphere.tutorial
 
-import androidx.compose.material.Button
-import androidx.compose.material.Text
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
 import th.or.gistda.sphere.SphereMap
